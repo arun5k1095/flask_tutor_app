@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Total Classes Taught: {{ total_classes }} hours</p>
+<p>Total Earnings: ₹{{ total_earnings }}</p>
+<table>
+    <tr>
+        <th>Student</th>
+        <th>Rate (₹)</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+        <td>{{ student.full_name }}</td>
+        <td>{{ student.rate_per_hour * student.currency_to_inr }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

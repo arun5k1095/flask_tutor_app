@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add Class</h2>
+<form method="POST">
+    <label for="student_id">Student:</label>
+    <select name="student_id" id="student_id" required>
+        {% for student in students %}
+        <option value="{{ student.id }}">{{ student.full_name }}</option>
+        {% endfor %}
+    </select>
+    <label for="class_date">Date:</label>
+    <input type="date" name="class_date" id="class_date" required>
+    <label for="class_time">Time:</label>
+    <input type="time" name="class_time" id="class_time" required>
+    <label for="duration">Duration (hours):</label>
+    <input type="number" step="0.01" name="duration" id="duration" required>
+    <button type="submit">Add Class</button>
+</form>
+{% endblock %}

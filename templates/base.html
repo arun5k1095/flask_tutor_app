@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Tutor Dashboard</title>
+</head>
+<body>
+    <header>
+        <h1>Tutor Dashboard</h1>
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/add_student">Add Student</a>
+            <a href="/manage_students">Manage Students</a>
+            <a href="/add_class">Add Class</a>
+			 <a href="/analytics">Analytics</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
