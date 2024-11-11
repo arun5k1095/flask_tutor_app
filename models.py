@@ -1,28 +1,38 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_continuum import make_versioned, versioning_manager
 
 db = SQLAlchemy()
 
-class Student(db.Model):
+
+# Define the User class
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+
+
+
+class Doctor(db.Model):
+    __versioned__ = {}
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    rate_per_hour = db.Column(db.Float, nullable=False)
-    currency = db.Column(db.String(10), nullable=False)
-    currency_to_inr = db.Column(db.Float, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
 
-    def __repr__(self):
-        return f"<Student {self.full_name}>"
-
-class ClassSession(db.Model):
+class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
-    date = db.Column(db.String(20), nullable=False)
-    time = db.Column(db.String(10), nullable=False)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
+    assigned_doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    assigned_doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
+
+class Session(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    session_date = db.Column(db.Date, nullable=False)
+    session_time = db.Column(db.Time, nullable=False)
     duration = db.Column(db.Float, nullable=False)
-    earnings = db.Column(db.Float, nullable=False)
-
-    student = db.relationship('Student', backref='classes')
-
-    def __repr__(self):
-        return f"<ClassSession {self.date} {self.time}>"
+    fee = db.Column(db.Float, nullable=False)
+    patient = db.relationship('Patient', backref=db.backref('sessions', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('sessions', lazy=True))

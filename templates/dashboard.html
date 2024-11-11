@@ -1,18 +1,26 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
-<h2>Dashboard</h2>
-<p>Total Classes Taught: {{ total_classes }} hours</p>
-<p>Total Earnings: ₹{{ total_earnings }}</p>
-<table>
-    <tr>
-        <th>Student</th>
-        <th>Rate (₹)</th>
-    </tr>
-    {% for student in students %}
-    <tr>
-        <td>{{ student.full_name }}</td>
-        <td>{{ student.rate_per_hour * student.currency_to_inr }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<h1>Welcome , team</h1>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h2>Total Patients</h2>
+        <p class="count">{{ total_patients }}</p>
+    </div>
+    <div class="card">
+        <h2>Total Sessions</h2>
+        <p class="count">{{ total_sessions }}</p>
+    </div>
+    <div class="card">
+        <h2>Total Earnings</h2>
+        <p class="count">₹{{ total_earnings }}</p>
+    </div>
+</div>
+
+<div class="actions">
+    <a href="{{ url_for('add_patient') }}" class="action-button">Add New Patient</a>
+    <a href="{{ url_for('add_doctor') }}" class="action-button">Add New Doctor</a>
+    <a href="{{ url_for('add_session') }}" class="action-button">Schedule Session</a>
+</div>
 {% endblock %}

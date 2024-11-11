@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Add Patient</h1>
+<form method="POST" action="{{ url_for('add_patient') }}" class="modern-form">
+    <label for="full_name">Full Name</label>
+    <input type="text" id="full_name" name="full_name" placeholder="Enter patient name" required>
+    
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="Enter patient email" required>
+    
+    <label for="phone">Phone</label>
+    <input type="text" id="phone" name="phone" placeholder="Enter patient phone number" required>
+    
+    <label for="assigned_doctor">Assigned Doctor</label>
+    <select id="assigned_doctor" name="assigned_doctor" required>
+        {% for doctor in doctors %}
+        <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+        {% endfor %}
+    </select>
+    
+    <button type="submit">Add Patient</button>
+</form>
+
+<h2>Existing Patients</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Assigned Doctor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in doctors[0].patients %}
+        <tr>
+            <td>{{ patient.full_name }}</td>
+            <td>{{ patient.email }}</td>
+            <td>{{ patient.phone }}</td>
+            <td>{{ patient.assigned_doctor.full_name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

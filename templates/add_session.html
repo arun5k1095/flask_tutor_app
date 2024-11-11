@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Schedule Session</h1>
+<form method="POST" action="{{ url_for('add_session') }}">
+    <label for="patient_id">Patient</label>
+    <select id="patient_id" name="patient_id" required>
+        {% for patient in patients %}
+        <option value="{{ patient.id }}">{{ patient.full_name }}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="doctor_id">Doctor</label>
+    <select id="doctor_id" name="doctor_id" required>
+        {% for doctor in doctors %}
+        <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="session_date">Date</label>
+    <input type="date" id="session_date" name="session_date" required>
+    
+    <label for="session_time">Time</label>
+    <input type="time" id="session_time" name="session_time" required>
+    
+    <label for="duration">Duration (hours)</label>
+    <input type="number" step="0.1" id="duration" name="duration" required>
+    
+    <label for="fee">Fee</label>
+    <input type="number" step="0.01" id="fee" name="fee" required>
+    
+    <button type="submit">Add Session</button>
+</form>
+{% endblock %}

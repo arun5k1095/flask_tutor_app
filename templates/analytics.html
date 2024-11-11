@@ -1,45 +1,31 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Analytics</h2>
+{% extends 'base.html' %}
 
-<!-- Summary Table -->
-<h3>Summary</h3>
+{% block content %}
+<h1>Session Analytics</h1>
 <table>
     <thead>
         <tr>
-            <th>Student Name</th>
-            <th>Hours Taught</th>
-            <th>Earnings</th>
+            <th>Session ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Duration (hours)</th>
+            <th>Fee (₹)</th>
         </tr>
     </thead>
     <tbody>
-        {% for row in summary %}
+        {% for item in data %}
         <tr>
-            <td>{{ row.student_name }}</td>
-            <td>{{ row.hours_taught }}</td>
-            <td>{{ row.earnings }}</td>
+            <td>{{ item['session_id'] }}</td>
+            <td>{{ item['patient_name'] }}</td>
+            <td>{{ item['doctor_name'] }}</td>
+            <td>{{ item['session_date'] }}</td>
+            <td>{{ item['session_time'] }}</td>
+            <td>{{ item['duration'] }}</td>
+            <td>{{ item['fee'] }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
-<!-- Graphs -->
-<h3>Graphs</h3>
-<div>
-    {% if earnings_graph %}
-    <h4>Earnings per Student</h4>
-    <img src="/{{ earnings_graph }}" alt="Earnings Graph">
-    {% else %}
-    <p>No data available for Earnings Graph.</p>
-    {% endif %}
-</div>
-<div>
-    {% if hours_graph %}
-    <h4>Hours Taught per Student</h4>
-    <img src="/{{ hours_graph }}" alt="Hours Taught Graph">
-    {% else %}
-    <p>No data available for Hours Taught Graph.</p>
-    {% endif %}
-</div>
-
 {% endblock %}

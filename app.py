@@ -1,135 +1,132 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, Student, ClassSession
+from flask_paginate import Pagination, get_page_parameter
+from sqlalchemy.sql import func
+from models import db, Doctor, Patient, Session
 from config import Config
 from datetime import datetime
-from sqlalchemy.sql import func
-import pandas as pd
-import matplotlib.pyplot as plt
 import os
+from sqlalchemy_continuum import versioning_manager
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
-# Manually create the database when the app starts
+# Initialize the database
 with app.app_context():
     db.create_all()
-    print("Database created successfully!")
+
 
 @app.route('/')
 def dashboard():
-    students = Student.query.all()
-    total_classes = db.session.query(func.sum(ClassSession.duration)).scalar() or 0
-    total_earnings = db.session.query(func.sum(ClassSession.earnings)).scalar() or 0
-    return render_template('dashboard.html', students=students, total_classes=total_classes, total_earnings=total_earnings)
+    total_patients = Patient.query.count()
+    total_sessions = Session.query.count()
+    total_earnings = db.session.query(func.sum(Session.fee)).scalar() or 0
+    return render_template('dashboard.html', total_patients=total_patients, total_sessions=total_sessions,
+                           total_earnings=total_earnings)
 
-@app.route('/add_student', methods=['GET', 'POST'])
-def add_student():
+
+@app.route('/add_doctor', methods=['GET', 'POST'])
+def add_doctor():
     if request.method == 'POST':
         full_name = request.form['full_name']
         email = request.form['email']
         phone = request.form['phone']
-        rate_per_hour = float(request.form['rate_per_hour'])
-        currency = request.form['currency']
-        currency_to_inr = float(request.form['currency_to_inr'])
-        new_student = Student(full_name=full_name, email=email, phone=phone,
-                              rate_per_hour=rate_per_hour, currency=currency,
-                              currency_to_inr=currency_to_inr)
-        db.session.add(new_student)
+        new_doctor = Doctor(full_name=full_name, email=email, phone=phone)
+        db.session.add(new_doctor)
         db.session.commit()
-        flash('Student added successfully!')
+        flash('Doctor added successfully!')
         return redirect(url_for('dashboard'))
-    return render_template('add_student.html')
+    return render_template('add_doctor.html')
 
-@app.route('/manage_students')
-def manage_students():
-    students = Student.query.all()  # Fetch all students from the database
-    return render_template('manage_students.html', students=students)
 
-@app.route('/add_class', methods=['GET', 'POST'])
-def add_class():
-    students = Student.query.all()  # Fetch all students for the dropdown
+@app.route('/add_patient', methods=['GET', 'POST'])
+def add_patient():
+    doctors = Doctor.query.all()
     if request.method == 'POST':
-        student_id = request.form['student_id']
-        class_date = request.form['class_date']
-        class_time = request.form['class_time']
-        duration = float(request.form['duration'])
-        student = Student.query.get(student_id)  # Fetch the student by ID
-        earnings = duration * student.rate_per_hour
-
-        # Create a new ClassSession
-        new_class = ClassSession(
-            student_id=student_id,
-            date=class_date,
-            time=class_time,
-            duration=duration,
-            earnings=earnings
-        )
-        db.session.add(new_class)
+        full_name = request.form['full_name']
+        email = request.form['email']
+        phone = request.form['phone']
+        assigned_doctor_id = request.form['assigned_doctor']
+        new_patient = Patient(full_name=full_name, email=email, phone=phone, assigned_doctor_id=assigned_doctor_id)
+        db.session.add(new_patient)
         db.session.commit()
-        flash('Class added successfully!')
+        flash('Patient added successfully!')
         return redirect(url_for('dashboard'))
+    return render_template('add_patient.html', doctors=doctors)
 
-    return render_template('add_class.html', students=students)
+
+@app.route('/add_session', methods=['GET', 'POST'])
+def add_session():
+    patients = Patient.query.all()
+    doctors = Doctor.query.all()
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        doctor_id = request.form['doctor_id']
+        session_date = request.form['session_date']
+        session_time = request.form['session_time']
+        duration = float(request.form['duration'])
+        fee = float(request.form['fee'])
+        new_session = Session(patient_id=patient_id, doctor_id=doctor_id, session_date=session_date,
+                              session_time=session_time, duration=duration, fee=fee)
+        db.session.add(new_session)
+        db.session.commit()
+        flash('Session added successfully!')
+        return redirect(url_for('dashboard'))
+    return render_template('add_session.html', patients=patients, doctors=doctors)
+
+
+@app.route('/patients')
+def manage_patients():
+    # Fetch the current page number from query parameters
+    page = request.args.get("page", default=1, type=int)
+    per_page = 3  # Number of records per page
+
+    # Use the updated paginate method
+    patients_pagination = Patient.query.paginate(page=page, per_page=per_page)
+
+    return render_template(
+        'manage_patients.html',
+        patients=patients_pagination.items,
+        pagination=patients_pagination
+    )
+
 
 
 @app.route('/analytics')
 def analytics():
-    # Query all class sessions and join with student details
-    classes = db.session.query(ClassSession, Student).join(Student).all()
+    # Explicitly define the join conditions to avoid ambiguity
+    sessions = db.session.query(
+        Session.id.label('session_id'),
+        Patient.full_name.label('patient_name'),
+        Doctor.full_name.label('doctor_name'),
+        Session.session_date,
+        Session.session_time,
+        Session.duration,
+        Session.fee
+    ).join(Patient, Session.patient_id == Patient.id) \
+     .join(Doctor, Session.doctor_id == Doctor.id) \
+     .all()
 
-    # Prepare data for analysis
+    # Prepare data for the template
     data = []
-    for class_session, student in classes:
+    for session in sessions:
         data.append({
-            'student_name': student.full_name,
-            'hours_taught': class_session.duration,
-            'earnings': class_session.earnings
+            'session_id': session.session_id,
+            'patient_name': session.patient_name,
+            'doctor_name': session.doctor_name,
+            'session_date': session.session_date.strftime('%Y-%m-%d'),
+            'session_time': session.session_time.strftime('%H:%M'),
+            'duration': session.duration,
+            'fee': session.fee,
         })
 
-    # Convert data to DataFrame
-    df = pd.DataFrame(data)
+    return render_template('analytics.html', data=data)
 
-    # Group by student and calculate totals
-    if not df.empty:
-        summary = df.groupby('student_name').sum().reset_index()
-    else:
-        summary = pd.DataFrame(columns=['student_name', 'hours_taught', 'earnings'])
 
-    # Generate graphs
-    if not summary.empty:
-        # Earnings per student
-        plt.figure(figsize=(10, 6))
-        plt.bar(summary['student_name'], summary['earnings'], color='skyblue')
-        plt.title('Earnings per Student')
-        plt.xlabel('Student')
-        plt.ylabel('Earnings (Currency)')
-        plt.xticks(rotation=45)
-        earnings_graph_path = os.path.join('static', 'earnings_graph.png')
-        plt.savefig(earnings_graph_path)
-        plt.close()
 
-        # Hours taught per student
-        plt.figure(figsize=(10, 6))
-        plt.bar(summary['student_name'], summary['hours_taught'], color='salmon')
-        plt.title('Hours Taught per Student')
-        plt.xlabel('Student')
-        plt.ylabel('Hours')
-        plt.xticks(rotation=45)
-        hours_graph_path = os.path.join('static', 'hours_graph.png')
-        plt.savefig(hours_graph_path)
-        plt.close()
-    else:
-        earnings_graph_path = None
-        hours_graph_path = None
 
-    return render_template(
-        'analytics.html',
-        summary=summary.to_dict(orient='records'),
-        earnings_graph=earnings_graph_path,
-        hours_graph=hours_graph_path
-    )
 
+# Main entry point
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Use PORT from environment, default to 5000
-    app.run(host='0.0.0.0', port=port, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
