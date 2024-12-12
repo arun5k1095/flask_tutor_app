@@ -17,7 +17,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-
+print("Hello, I have added a random print")
 @app.route('/')
 def dashboard():
     total_patients = Patient.query.count()
