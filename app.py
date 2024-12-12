@@ -1,3 +1,5 @@
+# Version : 2
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_paginate import Pagination, get_page_parameter
 from sqlalchemy.sql import func
