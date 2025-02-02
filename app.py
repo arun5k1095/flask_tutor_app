@@ -199,8 +199,7 @@ def article_detail(article_id):
         'published_date': row[4]
     }
     return render_template('article_detail.html', article=article)
-
 if __name__ == '__main__':
-    # Create tables once when the application starts.
     create_tables()
-    app.run(debug=True ,port=8080)
+    port = int(os.environ.get('PORT', 5000))   # Render provides the PORT env var
+    app.run(host='0.0.0.0', port=port)
