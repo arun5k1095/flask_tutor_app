@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} - Cybersecurity Articles{% endblock %}
+{% block content %}
+  <style>
+    /* General Container Fix */
+    .article-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 3rem 1rem;
+    }
+
+    /* Back Button */
+    .back-button {
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 600;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .btn-back:hover {
+      background: #007bff;
+      color: white !important;
+    }
+
+    /* Article Card */
+    .article-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .article-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Article Header - FIXED COLORS */
+    .article-header {
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, black, #003580);
+      color: #ffffff;
+      border-bottom: 10px solid #00225d;
+    }
+
+    .article-header h1 {
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .article-meta {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Fix Article Image */
+    .article-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-bottom: 4px solid #ddd;
+    }
+
+    /* Content Fixes */
+    .article-content {
+      padding: 2rem;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #333;
+    }
+
+    /* Dark Mode Support */
+    body.dark-mode .article-card {
+      background: #1e1e1e;
+      color: #f1f1f1;
+    }
+
+    body.dark-mode .article-header {
+      background: linear-gradient(135deg, #003580, #001f4d);
+      border-bottom: 5px solid #00132b;
+    }
+
+    body.dark-mode .article-content {
+      color: #ccc;
+    }
+
+    /* Responsive Fixes */
+    @media (max-width: 768px) {
+      .article-header h1 {
+        font-size: 1.8rem;
+      }
+      .article-content {
+        padding: 1.5rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+
+  <div class="container article-container">
+    <div class="back-button">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-back">
+        &larr; Back to Articles
+      </a>
+    </div>
+
+    <article class="article-card">
+      {% if article.image %}
+        <img src="{{ article.image }}" alt="{{ article.title }} image" class="article-image">
+      {% endif %}
+      <header class="article-header">
+        <h1>{{ article.title }}</h1>
+        <p class="article-meta">
+          By <strong>{{ article.author }}</strong> • {{ article.published_date.strftime('%B %d, %Y') }}
+        </p>
+      </header>
+      <section class="article-content">
+        {{ article.content | safe }}
+      </section>
+    </article>
+  </div>
+{% endblock %}

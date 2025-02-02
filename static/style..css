@@ -1,0 +1,116 @@
+/* Modern Sidebar with Glassmorphism */
+.sidebar {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 250px;
+  height: calc(100vh - 70px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 1rem;
+  transition: transform 0.4s ease, box-shadow 0.3s ease-in-out;
+  border-radius: 0 12px 12px 0;
+}
+
+body.dark-mode .sidebar {
+  background: rgba(20, 20, 20, 0.85);
+  box-shadow: 5px 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar Links */
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  padding: 12px 18px;
+  border-radius: 10px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sidebar Icon Styling */
+.sidebar .nav-link i {
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar Hover Effect */
+.sidebar .nav-link:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateX(7px);
+}
+
+.sidebar .nav-link:hover i {
+  transform: rotate(5deg);
+}
+
+/* Active Link */
+.sidebar .nav-link.active {
+  background: linear-gradient(135deg, #000, #333);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Styling */
+body.dark-mode .sidebar .nav-link {
+  color: #f0f0f0;
+}
+
+body.dark-mode .sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.sidebar .nav-link.disabled:hover {
+  background: none;
+  transform: none;
+}
+
+/* Sidebar Hide for Small Screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 220px;
+    padding: 1rem;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .sidebar .nav-link {
+    font-size: 0.9rem;
+  }
+}
+
+/* Elegant Cards */
+.card {
+  padding: 20px;
+  margin: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Cards */
+body.dark-mode .card {
+  background: rgba(25, 25, 25, 0.95);
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.08);
+}
+
+/* Smooth Sidebar Toggle Animation */
+.sidebar.collapsed {
+  transform: translateX(-100%);
+  box-shadow: none;
+}
